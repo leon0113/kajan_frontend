@@ -301,7 +301,7 @@ const MortgageCalculator = () => {
                         <h3 className="font-semibold text-lg mb-3">Mortgage Details</h3>
                         <div className="space-y-3">
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">Estimated Home Price:</span>
+                                <span className="text-muted-foreground">Estimated Home Price: <span className="text-xs">(5x)</span></span>
                                 <span className="font-semibold">${homePrice.toLocaleString()}</span>
                             </div>
                             <div className="flex justify-between">
@@ -383,47 +383,8 @@ const MortgageCalculator = () => {
                         </div>
                     </div>
 
-                    {/* ROI Analysis (if applicable) */}
-                    {roiInputs.monthlyRent > 0 && (
-                        <div className="p-4 bg-green-50 rounded-lg">
-                            <h3 className="font-semibold text-lg mb-3">Investment Analysis</h3>
-                            <div className="space-y-2">
-                                <div className="flex justify-between">
-                                    <span>Annual Rental Income:</span>
-                                    <span className="font-semibold text-green-600">${annualRent.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Net Rental Income:</span>
-                                    <span className="font-semibold">${netRentalIncome.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Cash-on-Cash Return:</span>
-                                    <span className="font-bold text-green-600">{cashOnCash.toFixed(2)}%</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
-                    {/* Commission Analysis (if applicable) */}
-                    {commissionInputs.salePrice > 0 && (
-                        <div className="p-4 bg-blue-50 rounded-lg">
-                            <h3 className="font-semibold text-lg mb-3">Commission Breakdown</h3>
-                            <div className="space-y-2">x
-                                <div className="flex justify-between">
-                                    <span>Gross Commission:</span>
-                                    <span className="font-semibold">${grossCommission.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Agent Split ({commissionInputs.splits}%):</span>
-                                    <span className="font-semibold">${agentSplit.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Net Commission:</span>
-                                    <span className="font-bold text-blue-600">${netCommission.toLocaleString()}</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+
                 </CardContent>
             </Card>
 
