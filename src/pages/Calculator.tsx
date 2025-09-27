@@ -8,6 +8,7 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calculator as CalculatorIcon, DollarSign, Percent, Save, Download } from "lucide-react";
 import MortgageCalculator from "@/components/calculator/MortgageCalculator";
+import MortgageCostCalculator from "@/components/calculator/DownPaymentCalculator";
 
 export default function Calculator() {
   // Mortgage Calculator State
@@ -76,8 +77,8 @@ export default function Calculator() {
       <Tabs defaultValue="mortgage" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="mortgage">Mortgage Calculator</TabsTrigger>
-          <TabsTrigger value="roi">ROI Calculator</TabsTrigger>
-          <TabsTrigger value="commission">Commission Calculator</TabsTrigger>
+          <TabsTrigger value="roi">Total Cost Calculator</TabsTrigger>
+          <TabsTrigger disabled className="cursor-not-allowed" value="commission">Commission Calculator</TabsTrigger>
         </TabsList>
 
         {/* Mortgage Calculator */}
@@ -87,103 +88,7 @@ export default function Calculator() {
 
         {/* ROI Calculator */}
         <TabsContent value="roi">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5" />
-                  Investment Inputs
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="purchasePrice">Purchase Price (CAD)</Label>
-                  <Input
-                    id="purchasePrice"
-                    type="number"
-                    value={roiInputs.purchasePrice}
-                    onChange={(e) => setRoiInputs(prev => ({ ...prev, purchasePrice: Number(e.target.value) }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="monthlyRent">Monthly Rent (CAD)</Label>
-                  <Input
-                    id="monthlyRent"
-                    type="number"
-                    value={roiInputs.monthlyRent}
-                    onChange={(e) => setRoiInputs(prev => ({ ...prev, monthlyRent: Number(e.target.value) }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="expenses">Monthly Expenses (CAD)</Label>
-                  <Input
-                    id="expenses"
-                    type="number"
-                    value={roiInputs.expenses}
-                    onChange={(e) => setRoiInputs(prev => ({ ...prev, expenses: Number(e.target.value) }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Annual Appreciation: {roiInputs.appreciation}%</Label>
-                  <Slider
-                    value={[roiInputs.appreciation]}
-                    onValueChange={(value) => setRoiInputs(prev => ({ ...prev, appreciation: value[0] }))}
-                    max={10}
-                    min={0}
-                    step={0.5}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Holding Period: {roiInputs.holdingPeriod} years</Label>
-                  <Slider
-                    value={[roiInputs.holdingPeriod]}
-                    onValueChange={(value) => setRoiInputs(prev => ({ ...prev, holdingPeriod: value[0] }))}
-                    max={20}
-                    min={1}
-                    step={1}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Investment Analysis</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Annual Rental Income:</span>
-                    <span className="font-semibold">${annualRent.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Annual Expenses:</span>
-                    <span className="font-semibold">${annualExpenses.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-lg font-bold text-success">
-                    <span>Net Annual Income:</span>
-                    <span>${netRentalIncome.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-lg font-bold text-primary">
-                    <span>Cash-on-Cash ROI:</span>
-                    <span>{cashOnCash.toFixed(2)}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Future Value:</span>
-                    <span className="font-semibold">${futureValue.toFixed(0)}</span>
-                  </div>
-                  <div className="flex justify-between text-success">
-                    <span>Total Appreciation:</span>
-                    <span>${totalAppreciation.toFixed(0)}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <MortgageCostCalculator />
         </TabsContent>
 
         {/* Commission Calculator */}

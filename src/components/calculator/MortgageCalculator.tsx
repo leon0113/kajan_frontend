@@ -6,7 +6,6 @@ import { useState } from "react";
 import ScenarioTable from "./CalculatedScenario";
 
 const MortgageCalculator = () => {
-
     const [mortgageInputs, setMortgageInputs] = useState({
         homePrice: 500000,
         downPayment: 100000,
@@ -43,7 +42,6 @@ const MortgageCalculator = () => {
         studentLoan: 0
     });
 
-
     // ROI Calculator State  
     const [roiInputs, setRoiInputs] = useState({
         purchasePrice: 400000,
@@ -60,6 +58,27 @@ const MortgageCalculator = () => {
         splits: 50,
         brokerageFee: 500,
     });
+
+    // Helper function to format numbers with commas
+    const formatNumber = (num) => {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    // Helper function to parse formatted numbers (remove commas)
+    const parseFormattedNumber = (str) => {
+        return parseFloat(str.replace(/,/g, '')) || 0;
+    };
+
+    // Helper function to handle input changes with comma formatting
+    const handleFinancialInputChange = (field, value) => {
+        const numericValue = parseFormattedNumber(value);
+        setFinancialInputs(prev => ({ ...prev, [field]: numericValue }));
+    };
+
+    // Helper function to format value for display
+    const getDisplayValue = (value) => {
+        return formatNumber(value);
+    };
 
     // Mortgage calculations using financialInputs
     const monthlyIncome = financialInputs.annualIncome / 12;
@@ -82,7 +101,7 @@ const MortgageCalculator = () => {
     // Qualifying ratios
     const gds = ((monthlyPayment + monthlyHousingCost) / monthlyIncome) * 100;
     const tds = ((monthlyPayment + monthlyHousingCost + totalMonthlyDebts) / monthlyIncome) * 100;
-    const minimumQualifyingRate = Math.max(financialInputs.interestRate, 6.99); // Stress test rate
+    const minimumQualifyingRate = Math.max(financialInputs.interestRate, 5.99); // Stress test rate
     const qualifyingPayment = monthlyPayment + monthlyHousingCost;
 
     // ROI Calculations
@@ -112,15 +131,18 @@ const MortgageCalculator = () => {
                     <div className="grid grid-cols-2 gap-4 p-3 bg-slate-50 rounded-lg">
                         <div>
                             <Label className="text-xs font-semibold text-slate-600">Annual Household Income</Label>
-                            <Input
-                                type="number"
-                                value={financialInputs.annualIncome}
-                                onChange={(e) => setFinancialInputs(prev => ({ ...prev, annualIncome: Number(e.target.value) }))}
-                                className="h-8 text-sm"
-                            />
+                            <div className="flex items-center">
+                                <span className="mr-2">$</span>
+                                <Input
+                                    type="text"
+                                    value={getDisplayValue(financialInputs.annualIncome)}
+                                    onChange={(e) => handleFinancialInputChange('annualIncome', e.target.value)}
+                                    className="h-8 text-sm"
+                                />
+                            </div>
                         </div>
                         <div className="text-right">
-                            <span className="text-lg font-bold text-green-600">${financialInputs.annualIncome.toLocaleString()}</span>
+                            <span className="text-lg font-bold text-green-600">${getDisplayValue(financialInputs.annualIncome)}</span>
                         </div>
                     </div>
 
@@ -128,22 +150,28 @@ const MortgageCalculator = () => {
                     <div className="space-y-3">
                         <div className="grid grid-cols-2 gap-4 items-center border-b pb-2">
                             <Label className="text-sm font-medium">Down Payment</Label>
-                            <Input
-                                type="number"
-                                value={financialInputs.downPaymentAmount}
-                                onChange={(e) => setFinancialInputs(prev => ({ ...prev, downPaymentAmount: Number(e.target.value) }))}
-                                className="h-8 text-sm"
-                            />
+                            <div className="flex items-center">
+                                <span className="mr-2">$</span>
+                                <Input
+                                    type="text"
+                                    value={getDisplayValue(financialInputs.downPaymentAmount)}
+                                    onChange={(e) => handleFinancialInputChange('downPaymentAmount', e.target.value)}
+                                    className="h-8 text-sm"
+                                />
+                            </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4 items-center border-b pb-2">
                             <Label className="text-sm font-medium">Enter Interest Rate</Label>
-                            <Input
-                                type="number"
-                                step="0.01"
-                                value={financialInputs.interestRate}
-                                onChange={(e) => setFinancialInputs(prev => ({ ...prev, interestRate: Number(e.target.value) }))}
-                                className="h-8 text-sm"
-                            />
+                            <div className="flex items-center">
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    value={financialInputs.interestRate}
+                                    onChange={(e) => setFinancialInputs(prev => ({ ...prev, interestRate: Number(e.target.value) }))}
+                                    className="h-8 text-sm"
+                                />
+                                <span className="ml-2">%</span>
+                            </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4 items-center border-b pb-2">
                             <Label className="text-sm font-medium">Amortization (Years)</Label>
@@ -164,7 +192,7 @@ const MortgageCalculator = () => {
                         </div>
                         <div>
                             <Label className="text-sm font-semibold text-red-700">Qualifying Payment</Label>
-                            <div className="text-lg font-bold text-red-600">${qualifyingPayment.toFixed(0)}</div>
+                            <div className="text-lg font-bold text-red-600">${getDisplayValue(qualifyingPayment.toFixed(0))}</div>
                         </div>
                     </div>
 
@@ -174,30 +202,39 @@ const MortgageCalculator = () => {
                         <div className="space-y-2">
                             <div className="grid grid-cols-2 gap-4 items-center">
                                 <Label className="text-xs">Property Tax</Label>
-                                <Input
-                                    type="number"
-                                    value={financialInputs.propertyTax}
-                                    onChange={(e) => setFinancialInputs(prev => ({ ...prev, propertyTax: Number(e.target.value) }))}
-                                    className="h-7 text-xs"
-                                />
+                                <div className="flex items-center">
+                                    <span className="mr-2">$</span>
+                                    <Input
+                                        type="text"
+                                        value={getDisplayValue(financialInputs.propertyTax)}
+                                        onChange={(e) => handleFinancialInputChange('propertyTax', e.target.value)}
+                                        className="h-7 text-xs"
+                                    />
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 items-center">
                                 <Label className="text-xs">Utilities (Hydro+Water+Heating+Ins)</Label>
-                                <Input
-                                    type="number"
-                                    value={financialInputs.utilities}
-                                    onChange={(e) => setFinancialInputs(prev => ({ ...prev, utilities: Number(e.target.value) }))}
-                                    className="h-7 text-xs"
-                                />
+                                <div className="flex items-center">
+                                    <span className="mr-2">$</span>
+                                    <Input
+                                        type="text"
+                                        value={getDisplayValue(financialInputs.utilities)}
+                                        onChange={(e) => handleFinancialInputChange('utilities', e.target.value)}
+                                        className="h-7 text-xs"
+                                    />
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 items-center">
                                 <Label className="text-xs">Condo Fee(if applicable)</Label>
-                                <Input
-                                    type="number"
-                                    value={financialInputs.condoFee}
-                                    onChange={(e) => setFinancialInputs(prev => ({ ...prev, condoFee: Number(e.target.value) }))}
-                                    className="h-7 text-xs"
-                                />
+                                <div className="flex items-center">
+                                    <span className="mr-2">$</span>
+                                    <Input
+                                        type="text"
+                                        value={getDisplayValue(financialInputs.condoFee)}
+                                        onChange={(e) => handleFinancialInputChange('condoFee', e.target.value)}
+                                        className="h-7 text-xs"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -222,12 +259,15 @@ const MortgageCalculator = () => {
                                 ].map(({ key, label }) => (
                                     <div key={key} className="grid grid-cols-2 gap-4 items-center">
                                         <Label className="text-xs">{label}</Label>
-                                        <Input
-                                            type="number"
-                                            value={financialInputs[key]}
-                                            onChange={(e) => setFinancialInputs(prev => ({ ...prev, [key]: Number(e.target.value) }))}
-                                            className="h-6 text-xs"
-                                        />
+                                        <div className="flex items-center">
+                                            <span className="mr-2">$</span>
+                                            <Input
+                                                type="text"
+                                                value={getDisplayValue(financialInputs[key])}
+                                                onChange={(e) => handleFinancialInputChange(key, e.target.value)}
+                                                className="h-6 text-xs"
+                                            />
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -247,12 +287,15 @@ const MortgageCalculator = () => {
                                 ].map(({ key, label }) => (
                                     <div key={key} className="grid grid-cols-2 gap-4 items-center">
                                         <Label className="text-xs">{label}</Label>
-                                        <Input
-                                            type="number"
-                                            value={financialInputs[key]}
-                                            onChange={(e) => setFinancialInputs(prev => ({ ...prev, [key]: Number(e.target.value) }))}
-                                            className="h-6 text-xs"
-                                        />
+                                        <div className="flex items-center">
+                                            <span className="mr-2">$</span>
+                                            <Input
+                                                type="text"
+                                                value={getDisplayValue(financialInputs[key])}
+                                                onChange={(e) => handleFinancialInputChange(key, e.target.value)}
+                                                className="h-6 text-xs"
+                                            />
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -272,25 +315,25 @@ const MortgageCalculator = () => {
                         <div className="space-y-2">
                             <div className="flex justify-between">
                                 <span className="text-green-600 font-medium">Monthly Income:</span>
-                                <span className="font-bold text-green-600">${monthlyIncome.toLocaleString()}</span>
+                                <span className="font-bold text-green-600">${getDisplayValue(monthlyIncome.toFixed(0))}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-blue-600">Housing Costs:</span>
-                                <span className="font-semibold text-blue-600">${(monthlyPayment + monthlyHousingCost).toFixed(0)}</span>
+                                <span className="font-semibold text-blue-600">${getDisplayValue((monthlyPayment + monthlyHousingCost).toFixed(0))}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Living Expenses:</span>
-                                <span className="font-semibold text-gray-600">${totalLivingExpenses.toFixed(0)}</span>
+                                <span className="font-semibold text-gray-600">${getDisplayValue(totalLivingExpenses.toFixed(0))}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-red-600">Monthly Debts:</span>
-                                <span className="font-semibold text-red-600">${totalMonthlyDebts.toFixed(0)}</span>
+                                <span className="font-semibold text-red-600">${getDisplayValue(totalMonthlyDebts.toFixed(0))}</span>
                             </div>
                             <hr className="my-2" />
                             <div className="flex justify-between text-lg">
                                 <span className="font-bold">Remaining Cash:</span>
                                 <span className={`font-bold ${(monthlyIncome - monthlyPayment - monthlyHousingCost - totalLivingExpenses - totalMonthlyDebts) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                    ${(monthlyIncome - monthlyPayment - monthlyHousingCost - totalLivingExpenses - totalMonthlyDebts).toFixed(0)}
+                                    ${getDisplayValue((monthlyIncome - monthlyPayment - monthlyHousingCost - totalLivingExpenses - totalMonthlyDebts).toFixed(0))}
                                 </span>
                             </div>
                         </div>
@@ -302,19 +345,19 @@ const MortgageCalculator = () => {
                         <div className="space-y-3">
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">Estimated Home Price: <span className="text-xs">(5x)</span></span>
-                                <span className="font-semibold">${homePrice.toLocaleString()}</span>
+                                <span className="font-semibold">${getDisplayValue(homePrice.toFixed(0))}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">Loan Amount:</span>
-                                <span className="font-semibold">${loanAmount.toLocaleString()}</span>
+                                <span className="font-semibold">${getDisplayValue(loanAmount.toFixed(0))}</span>
                             </div>
                             <div className="flex justify-between text-xl">
                                 <span className="font-bold text-primary">Monthly Payment:</span>
-                                <span className="font-bold text-primary">${monthlyPayment.toFixed(0)}</span>
+                                <span className="font-bold text-primary">${getDisplayValue(monthlyPayment.toFixed(0))}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">Total Interest (Life of Loan):</span>
-                                <span className="font-semibold">${((monthlyPayment * totalPayments) - loanAmount).toLocaleString()}</span>
+                                <span className="font-semibold">${getDisplayValue(((monthlyPayment * totalPayments) - loanAmount).toFixed(0))}</span>
                             </div>
                         </div>
                     </div>
@@ -361,12 +404,12 @@ const MortgageCalculator = () => {
                             <div className="flex justify-between">
                                 <span>Maximum Affordable Home Price:</span>
                                 <span className="font-bold text-purple-600">
-                                    ${(loanAmount + financialInputs.downPaymentAmount).toLocaleString()}
+                                    ${getDisplayValue((loanAmount + financialInputs.downPaymentAmount).toFixed(0))}
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Down Payment Required:</span>
-                                <span className="font-semibold">${financialInputs.downPaymentAmount.toLocaleString()}</span>
+                                <span className="font-semibold">${getDisplayValue(financialInputs.downPaymentAmount)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Down Payment %:</span>
@@ -382,12 +425,8 @@ const MortgageCalculator = () => {
                             )}
                         </div>
                     </div>
-
-
-
                 </CardContent>
             </Card>
-
 
             <Card>
                 <CardHeader>

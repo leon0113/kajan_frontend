@@ -40,38 +40,71 @@ const ScenarioTable = ({ financialInputs }) => {
         };
     };
 
-    // Example scenarios
-    const maxStretch = calculateScenario(441000, 22050, financialInputs.interestRate, financialInputs.amortizationYears);
-    const balancedBudget = calculateScenario(399000, 19950, financialInputs.interestRate, financialInputs.amortizationYears);
-    const playItSafe = calculateScenario(333000, 16650, financialInputs.interestRate, financialInputs.amortizationYears);
+    // Example scenarios - using values from your image
+    const maxStretch = calculateScenario(639000, 639000 * 0.05, financialInputs.interestRate, financialInputs.amortizationYears);
+    const balancedBudget = calculateScenario(603000, 603000 * 0.05, financialInputs.interestRate, financialInputs.amortizationYears);
+    const playItSafe = calculateScenario(509000, 509000 * 0.05, financialInputs.interestRate, financialInputs.amortizationYears);
 
     const scenarios = [
-        { title: "MAXIMUM STRETCH", data: maxStretch, color: "bg-red-700" },
-        { title: "BALANCED BUDGET", data: balancedBudget, color: "bg-yellow-700" },
-        { title: "PLAY IT SAFE", data: playItSafe, color: "bg-green-700" },
+        { title: "MAXIMUM STRETCH", data: maxStretch, color: "bg-red-600" },
+        { title: "BALANCED BUDGET", data: balancedBudget, color: "bg-yellow-600" },
+        { title: "PLAY IT SAFE", data: playItSafe, color: "bg-green-600" },
     ];
 
+    const rows = [
+        { label: "PURCHASE PRICE", key: "purchasePrice", format: "currency" },
+        { label: "MIN DOWN PAYMENT", key: "downPayment", format: "currency" },
+        { label: "CMHC PREMIUM", key: "cmhcPremium", format: "currency" },
+        { label: "MORTGAGE REQ", key: "mortgageReq", format: "currency" },
+        { label: "MORTGAGE PAYMENT (Per Month)", key: "monthlyPayment", format: "currency" },
+        { label: "QUALIFYING PAYMENT", key: "qualifyingPayment", format: "currency" },
+        { label: "GDS (Gross Debt Service)", key: "gds", format: "percentage" },
+        { label: "TDS (Total Debt Service)", key: "tds", format: "percentage" },
+        { label: "CLOSING COSTS (APPROX)", key: "closingCosts", format: "currency" },
+    ];
+
+    const formatValue = (value: number, format: string) => {
+        if (format === "currency") {
+            return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        } else if (format === "percentage") {
+            return `${value.toFixed(2)}%`;
+        }
+        return value.toString();
+    };
+
     return (
-        <div className="grid grid-cols-3 gap-4 mt-6">
-            {scenarios.map(({ title, data, color }) => (
-                <div key={title} className="rounded-lg shadow-md overflow-hidden">
-                    <div className={`${color} text-white text-center font-bold py-2`}>{title}</div>
-                    <div className="p-3 bg-white space-y-2 text-sm">
-                        <div className="flex justify-between"><span>Purchase Price</span><span>${data.purchasePrice.toLocaleString()}</span></div>
-                        <div className="flex justify-between"><span>Min Down Payment</span><span>${data.downPayment.toLocaleString()}</span></div>
-                        <div className="flex justify-between"><span>CMHC Premium</span><span>${data.cmhcPremium.toLocaleString()}</span></div>
-                        <div className="flex justify-between"><span>Mortgage Req</span><span>${data.mortgageReq.toLocaleString()}</span></div>
-                        <div className="flex justify-between"><span>Mortgage Payment</span><span>${data.monthlyPayment.toFixed(2)}</span></div>
-                        <div className="flex justify-between"><span>Qualifying Payment</span><span>${data.qualifyingPayment.toFixed(2)}</span></div>
-                        <div className="flex justify-between"><span>GDS</span><span>{data.gds.toFixed(2)}%</span></div>
-                        <div className="flex justify-between"><span>TDS</span><span>{data.tds.toFixed(2)}%</span></div>
-                        <div className="flex justify-between"><span>Closing Costs</span><span>${data.closingCosts.toLocaleString()}</span></div>
-                    </div>
-                </div>
-            ))}
+        <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-300 text-sm">
+                <thead>
+                    <tr className="bg-gray-100">
+                        <th className="border border-gray-300 p-3 text-left font-bold w-1/4"></th>
+                        {scenarios.map((scenario, index) => (
+                            <th
+                                key={scenario.title}
+                                className={`border border-gray-300 p-3 text-center font-bold text-white ${scenario.color}`}
+                            >
+                                {scenario.title}
+                            </th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows.map((row, rowIndex) => (
+                        <tr key={row.label} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                            <td className="border border-gray-300 p-3 font-semibold text-gray-700">
+                                {row.label}
+                            </td>
+                            {scenarios.map((scenario) => (
+                                <td key={`${scenario.title}-${row.key}`} className="border border-gray-300 p-3 text-right font-bold">
+                                    {formatValue(scenario.data[row.key], row.format)}
+                                </td>
+                            ))}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 };
-
 
 export default ScenarioTable;
