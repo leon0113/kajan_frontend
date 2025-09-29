@@ -17,6 +17,7 @@ const MortgageCalculator = () => {
     // Financial Profile State
     const [financialInputs, setFinancialInputs] = useState({
         annualIncome: 105000,
+        taxRate: 25, // New tax rate field
         downPaymentAmount: 80000,
         interestRate: 4.99,
         amortizationYears: 30,
@@ -80,8 +81,11 @@ const MortgageCalculator = () => {
         return formatNumber(value);
     };
 
-    // Mortgage calculations using financialInputs
-    const monthlyIncome = financialInputs.annualIncome / 12;
+    // Calculate monthly income after tax
+    const annualIncomeAfterTax = financialInputs.annualIncome * (1 - financialInputs.taxRate / 100);
+    const monthlyIncome = annualIncomeAfterTax / 12;
+
+    // Monthly expenses calculations
     const monthlyHousingCost = financialInputs.propertyTax + financialInputs.utilities + financialInputs.condoFee;
     const totalLivingExpenses = financialInputs.groceries + financialInputs.transportation +
         financialInputs.carInsurance + financialInputs.phoneBill + financialInputs.childCare +
@@ -94,6 +98,7 @@ const MortgageCalculator = () => {
     // Mortgage payment calculation
     const monthlyRate = financialInputs.interestRate / 100 / 12;
     const totalPayments = financialInputs.amortizationYears * 12;
+    console.log("monthlyIncome", monthlyIncome)
     const homePrice = monthlyIncome * 12 * 5; // Rough estimate for display
     const loanAmount = homePrice - financialInputs.downPaymentAmount;
     const monthlyPayment = loanAmount > 0 ? loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / (Math.pow(1 + monthlyRate, totalPayments) - 1) : 0;
@@ -143,6 +148,27 @@ const MortgageCalculator = () => {
                         </div>
                         <div className="text-right">
                             <span className="text-lg font-bold text-green-600">${getDisplayValue(financialInputs.annualIncome)}</span>
+                        </div>
+                    </div>
+
+                    {/* Tax Rate Section */}
+                    <div className="grid grid-cols-2 gap-4 p-3 bg-blue-50 rounded-lg">
+                        <div>
+                            <Label className="text-xs font-semibold text-blue-600">Enter Tax Rate</Label>
+                            <div className="flex items-center">
+                                <Input
+                                    type="number"
+                                    step="0.1"
+                                    value={financialInputs.taxRate}
+                                    onChange={(e) => setFinancialInputs(prev => ({ ...prev, taxRate: Number(e.target.value) }))}
+                                    className="h-8 text-sm"
+                                />
+                                <span className="ml-2">%</span>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <Label className="text-xs font-semibold text-blue-600">Monthly Income After Tax</Label>
+                            <div className="text-lg font-bold text-blue-600">${getDisplayValue(monthlyIncome.toFixed(0))}</div>
                         </div>
                     </div>
 
@@ -314,7 +340,7 @@ const MortgageCalculator = () => {
                         <h3 className="font-semibold text-lg mb-3">Monthly Cash Flow</h3>
                         <div className="space-y-2">
                             <div className="flex justify-between">
-                                <span className="text-green-600 font-medium">Monthly Income:</span>
+                                <span className="text-green-600 font-medium">Monthly Income (After Tax):</span>
                                 <span className="font-bold text-green-600">${getDisplayValue(monthlyIncome.toFixed(0))}</span>
                             </div>
                             <div className="flex justify-between">
@@ -331,10 +357,33 @@ const MortgageCalculator = () => {
                             </div>
                             <hr className="my-2" />
                             <div className="flex justify-between text-lg">
-                                <span className="font-bold">Remaining Cash:</span>
+                                <span className="font-bold">Cash Balance:</span>
                                 <span className={`font-bold ${(monthlyIncome - monthlyPayment - monthlyHousingCost - totalLivingExpenses - totalMonthlyDebts) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                                     ${getDisplayValue((monthlyIncome - monthlyPayment - monthlyHousingCost - totalLivingExpenses - totalMonthlyDebts).toFixed(0))}
                                 </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Income Breakdown */}
+                    <div className="p-4 bg-purple-50 rounded-lg">
+                        <h3 className="font-semibold text-lg mb-3">Income Breakdown</h3>
+                        <div className="space-y-2">
+                            <div className="flex justify-between">
+                                <span className="text-muted-foreground">Annual Gross Income:</span>
+                                <span className="font-semibold">${getDisplayValue(financialInputs.annualIncome)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-muted-foreground">Tax Deduction ({financialInputs.taxRate}%):</span>
+                                <span className="font-semibold text-red-600">-${getDisplayValue((financialInputs.annualIncome * financialInputs.taxRate / 100).toFixed(0))}</span>
+                            </div>
+                            <div className="flex justify-between border-t pt-2">
+                                <span className="font-bold">Annual Net Income:</span>
+                                <span className="font-bold text-green-600">${getDisplayValue(annualIncomeAfterTax.toFixed(0))}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-bold">Monthly Net Income:</span>
+                                <span className="font-bold text-green-600">${getDisplayValue(monthlyIncome.toFixed(0))}</span>
                             </div>
                         </div>
                     </div>
@@ -344,7 +393,7 @@ const MortgageCalculator = () => {
                         <h3 className="font-semibold text-lg mb-3">Mortgage Details</h3>
                         <div className="space-y-3">
                             <div className="flex justify-between">
-                                <span className="text-muted-foreground">Estimated Home Price: <span className="text-xs">(5x)</span></span>
+                                <span className="text-muted-foreground">Estimated Home Price: <span className="text-xs">(5x yearly income)</span></span>
                                 <span className="font-semibold">${getDisplayValue(homePrice.toFixed(0))}</span>
                             </div>
                             <div className="flex justify-between">
@@ -363,7 +412,7 @@ const MortgageCalculator = () => {
                     </div>
 
                     {/* Debt Service Ratios */}
-                    <div className="p-4 bg-yellow-50 rounded-lg">
+                    {/* <div className="p-4 bg-yellow-50 rounded-lg">
                         <h3 className="font-semibold text-lg mb-3">Qualification Ratios</h3>
                         <div className="space-y-3">
                             <div className="flex justify-between items-center">
@@ -395,7 +444,7 @@ const MortgageCalculator = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Affordability Summary */}
                     <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">

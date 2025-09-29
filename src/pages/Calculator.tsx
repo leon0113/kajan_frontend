@@ -8,7 +8,8 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calculator as CalculatorIcon, DollarSign, Percent, Save, Download } from "lucide-react";
 import MortgageCalculator from "@/components/calculator/MortgageCalculator";
-import MortgageCostCalculator from "@/components/calculator/DownPaymentCalculator";
+import MortgageCostCalculator from "@/components/calculator/MortgageCostCalculator";
+import DownPaymentPlanner from "@/components/calculator/DownPaymentPlanner";
 
 export default function Calculator() {
   // Mortgage Calculator State
@@ -78,7 +79,7 @@ export default function Calculator() {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="mortgage">Mortgage Calculator</TabsTrigger>
           <TabsTrigger value="roi">Total Cost Calculator</TabsTrigger>
-          <TabsTrigger disabled className="cursor-not-allowed" value="commission">Commission Calculator</TabsTrigger>
+          <TabsTrigger value="commission">Down Payment Planner</TabsTrigger>
         </TabsList>
 
         {/* Mortgage Calculator */}
@@ -93,89 +94,7 @@ export default function Calculator() {
 
         {/* Commission Calculator */}
         <TabsContent value="commission">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Percent className="h-5 w-5" />
-                  Commission Inputs
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="salePrice">Sale Price (CAD)</Label>
-                  <Input
-                    id="salePrice"
-                    type="number"
-                    value={commissionInputs.salePrice}
-                    onChange={(e) => setCommissionInputs(prev => ({ ...prev, salePrice: Number(e.target.value) }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Commission Rate: {commissionInputs.commissionRate}%</Label>
-                  <Slider
-                    value={[commissionInputs.commissionRate]}
-                    onValueChange={(value) => setCommissionInputs(prev => ({ ...prev, commissionRate: value[0] }))}
-                    max={7}
-                    min={1}
-                    step={0.25}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Agent Split: {commissionInputs.splits}%</Label>
-                  <Slider
-                    value={[commissionInputs.splits]}
-                    onValueChange={(value) => setCommissionInputs(prev => ({ ...prev, splits: value[0] }))}
-                    max={100}
-                    min={30}
-                    step={5}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="brokerageFee">Brokerage Fees (CAD)</Label>
-                  <Input
-                    id="brokerageFee"
-                    type="number"
-                    value={commissionInputs.brokerageFee}
-                    onChange={(e) => setCommissionInputs(prev => ({ ...prev, brokerageFee: Number(e.target.value) }))}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Commission Breakdown</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Sale Price:</span>
-                    <span className="font-semibold">${commissionInputs.salePrice.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Gross Commission:</span>
-                    <span className="font-semibold">${grossCommission.toFixed(0)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Agent Split ({commissionInputs.splits}%):</span>
-                    <span className="font-semibold">${agentSplit.toFixed(0)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Brokerage Fees:</span>
-                    <span className="font-semibold">-${commissionInputs.brokerageFee.toFixed(0)}</span>
-                  </div>
-                  <div className="flex justify-between text-lg font-bold text-success border-t pt-3">
-                    <span>Net Commission:</span>
-                    <span>${netCommission.toFixed(0)}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <DownPaymentPlanner />
         </TabsContent>
       </Tabs>
     </div>
